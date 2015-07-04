@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 import flask_admin as admin
@@ -15,6 +15,12 @@ db = SQLAlchemy(app)
 @app.route('/')
 def index():
     return '<a href="/admin/">Click me to get to Admin!</a>'
+
+class IndexPage(admin.BaseView):
+    @admin.expose('/')
+    def index(self):
+        papers = ReadPaper.query.all()
+        return self.render('admin/index.html', read_papers=papers)
 
 class Paper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,10 +46,12 @@ class PaperAdmin(sqla.ModelView):
 
 admin = admin.Admin(app, name='Tracked', template_mode='bootstrap3')
 
+admin.add_view(IndexPage(name="index"))
 #admin.add_view(PaperAdmin(Paper, db.session))
 admin.add_view(sqla.ModelView(Paper, db.session))
 admin.add_view(sqla.ModelView(ReadPaper, db.session))
+
 if __name__ == '__main__':
-    db.drop_all()
+    #db.drop_all()
     db.create_all()
     app.run(host='0.0.0.0', debug=True)
