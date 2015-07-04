@@ -1,13 +1,26 @@
 {% extends 'admin/master.html' %}
 
+{% block head %}
+
+<link href="/static/css/tracked.css" rel="stylesheet">
+{% endblock head %}
+
 {% block body %}
 
 <div class="container">
 
-    <div class="row">Main container</div>
-        {% for read in read_papers %}
-        {{read.date}}<br>{{read.pass_number}}
-        {% endfor %}
+    <div class="row">Read Paper Data</div>
+
+      <table id="tracker">
+        <thead>
+        <th>Date Read<th>Pass #<th>Title</thead>
+            <tbody>
+              {% for read in read_papers %}
+              <tr>
+                <td>{{read.date}}
+                <td>{{read.pass_number}}
+                <td>{{read.paper.title}}
+      </tr>  {% endfor %}</tbody>
 </div>
 
 
