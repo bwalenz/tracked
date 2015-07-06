@@ -51,6 +51,16 @@ class ReadPaper(db.Model):
     def __unicode__(self):
         return self.pass_number
 
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    paper_id = db.Column(db.Integer, db.ForeignKey(Paper.id))
+    text = db.Column(db.String(255), unique=True)
+    paper = db.relationship(Paper)
+
+    def __unicode__(self):
+        return self.text
+
+
 class PaperAdmin(sqla.ModelView):
     inline_models = (ReadPaper,)
 
@@ -59,6 +69,7 @@ admin = admin.Admin(app, index_view=IndexPage(), name='Tracked', template_mode='
 #admin.add_view(PaperAdmin(Paper, db.session))
 admin.add_view(sqla.ModelView(Paper, db.session))
 admin.add_view(sqla.ModelView(ReadPaper, db.session))
+admin.add_view(sqla.ModelView(Tag, db.session))
 
 if __name__ == '__main__':
     #db.drop_all()
