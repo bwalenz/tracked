@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-
+from flask import jsonify
 import flask_admin as admin
 from flask_admin.contrib import sqla
 app = Flask(__name__)
@@ -16,7 +16,17 @@ db = SQLAlchemy(app)
 def index():
     return '<a href="/admin/">Click me to get to Admin!</a>'
 
-class IndexPage(admin.BaseView):
+@app.route('/papers')
+def papers():
+    papers = ReadPaper.query.all()
+    paper_list = []
+    for paper in papers:
+        paper_dict = {"date":str(paper.date), "pass_number":str(paper.pass_number), "title":paper.paper.title}
+        paper_list.append(paper_dict)
+    json_papers = jsonify(results=paper_list)
+    return json_papers 
+
+class IndexPage(admin.AdminIndexView):
     @admin.expose('/')
     def index(self):
         papers = ReadPaper.query.all()
@@ -44,9 +54,8 @@ class ReadPaper(db.Model):
 class PaperAdmin(sqla.ModelView):
     inline_models = (ReadPaper,)
 
-admin = admin.Admin(app, name='Tracked', template_mode='bootstrap3')
+admin = admin.Admin(app, index_view=IndexPage(), name='Tracked', template_mode='bootstrap3')
 
-admin.add_view(IndexPage(name="index"))
 #admin.add_view(PaperAdmin(Paper, db.session))
 admin.add_view(sqla.ModelView(Paper, db.session))
 admin.add_view(sqla.ModelView(ReadPaper, db.session))
