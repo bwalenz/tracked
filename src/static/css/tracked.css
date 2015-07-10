@@ -16,7 +16,7 @@ table#tracker thead th, table#tracker tbody td {
   padding: .8rem; font-size: 1.4rem;
 }
 table#tracker tbody td {
-  text-align: right;
+  text-align: left;
   padding: .8rem; font-size: 1.4rem;
   color: #444; background: #eee;
 }

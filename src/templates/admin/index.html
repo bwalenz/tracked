@@ -1,27 +1,37 @@
+
 {% extends 'admin/master.html' %}
 
 {% block head %}
-
 <link href="/static/css/tracked.css" rel="stylesheet">
+<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/css/bootstrap-table.css" rel="stylesheet">
+<script src="/admin/static/vendor/jquery-2.1.1.min.js"></script>
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/bootstrap-table-all.js"></script>
+
 {% endblock head %}
 
 {% block body %}
 
-<div class="container">
+<div class="container"><h1></h1>
 
-    <div class="row">Read Paper Data</div>
 
-      <table id="tracker">
-        <thead>
-        <th>Date Read<th>Pass #<th>Title</thead>
-            <tbody>
-              {% for read in read_papers %}
-              <tr>
-                <td>{{read.date}}
-                <td>{{read.pass_number}}
-                <td>{{read.paper.title}}
-      </tr>  {% endfor %}</tbody>
+    <div class="row"></div>
+
 </div>
+      <table data-toggle="table" id="table"
+      data-toolbar="#filter-bar"
+      data-filter-control="true" data-url="http://localhost:5000/papers"
+        data-show-columns="true">
+        <thead>
+        <tr>
+        <th data-sortable="true" data-field="date">Date Read</th>
+        <th data-field="pass_number" data-filter-control="select">Pass #</th>
+        <th data-filter-control="input" data-field="title">Title</th>
+        </tr>
+</thead>
+           </table>
+ </div>
 
 
 {% endblock body %}

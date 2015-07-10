@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
 import flask_admin as admin
 from flask_admin.contrib import sqla
+from flask import Response
+import json
+
 app = Flask(__name__)
 
 
@@ -24,7 +27,9 @@ def papers():
         paper_dict = {"date":str(paper.date), "pass_number":str(paper.pass_number), "title":paper.paper.title}
         paper_list.append(paper_dict)
     json_papers = jsonify(results=paper_list)
-    return json_papers 
+    jp = json.dumps(paper_list)
+    return Response(jp,  mimetype='application/json')
+    #return json_papers 
 
 class IndexPage(admin.AdminIndexView):
     @admin.expose('/')
