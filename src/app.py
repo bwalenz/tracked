@@ -24,12 +24,14 @@ def papers():
     papers = ReadPaper.query.all()
     paper_list = []
     for paper in papers:
-        paper_dict = {"date":str(paper.date), "pass_number":str(paper.pass_number), "title":paper.paper.title}
+        tag_str = ""
+        for tag in paper.paper.tags:
+            tag_str += '<a href = "/tag/' + str(tag.tag.id) + '">' + tag.tag.text + '</a>, '
+        paper_dict = {"date":str(paper.date), "pass_number":str(paper.pass_number), "title":paper.paper.title, "url":paper.paper.url, "tags":tag_str}
         paper_list.append(paper_dict)
-    json_papers = jsonify(results=paper_list)
     jp = json.dumps(paper_list)
     return Response(jp,  mimetype='application/json')
-    #return json_papers 
+    #return json_papers
 
 class IndexPage(admin.AdminIndexView):
     @admin.expose('/')
@@ -41,10 +43,10 @@ class Paper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(255), unique=True)
     title = db.Column(db.Text, unique=True)
-    citation = db.Column(db.Text) 
-
+    citation = db.Column(db.Text)
+    tags = db.relationship("PaperTag")
     def __unicode__(self):
-        return self.url
+        return self.title
 
 class ReadPaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,16 +60,20 @@ class ReadPaper(db.Model):
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    paper_id = db.Column(db.Integer, db.ForeignKey(Paper.id))
     text = db.Column(db.String(255), unique=True)
-    paper = db.relationship(Paper)
 
     def __unicode__(self):
         return self.text
 
+class PaperTag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey(Tag.id))
+    paper_id = db.Column(db.Integer, db.ForeignKey(Paper.id))
+    paper = db.relationship(Paper)
+    tag = db.relationship(Tag)
 
-class PaperAdmin(sqla.ModelView):
-    inline_models = (ReadPaper,)
+    def __unicode__(self):
+        return self.paper.title + " : " + self.tag.text
 
 admin = admin.Admin(app, index_view=IndexPage(), name='Tracked', template_mode='bootstrap3')
 
@@ -75,8 +81,9 @@ admin = admin.Admin(app, index_view=IndexPage(), name='Tracked', template_mode='
 admin.add_view(sqla.ModelView(Paper, db.session))
 admin.add_view(sqla.ModelView(ReadPaper, db.session))
 admin.add_view(sqla.ModelView(Tag, db.session))
+admin.add_view(sqla.ModelView(PaperTag, db.session))
 
 if __name__ == '__main__':
     #db.drop_all()
-    db.create_all()
+    #db.create_all()
     app.run(host='0.0.0.0', debug=True)
